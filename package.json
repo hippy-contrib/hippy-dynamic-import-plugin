@@ -1,0 +1,25 @@
+{
+  "name": "hippy-dynamic-import-plugin",
+  "version": "1.0.0",
+  "description": "hippy webpack 打包动态加载chunk包插件",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hippy-contrib/hippy-dynamic-import-plugin.git"
+  },
+  "keywords": [
+    "hippy",
+    "webpack",
+    "dynamic",
+    "import"
+  ],
+  "author": "charleeshen <charleeshen@tencent.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hippy-contrib/hippy-dynamic-import-plugin/issues"
+  },
+  "homepage": "https://github.com/hippy-contrib/hippy-dynamic-import-plugin#readme"
+}
