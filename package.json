@@ -1,7 +1,7 @@
 {
-  "name": "hippy-dynamic-import-plugin",
+  "name": "@hippy/hippy-dynamic-import-plugin",
   "version": "1.0.0",
-  "description": "hippy webpack 打包动态加载chunk包插件",
+  "description": "hippy webpack打包动态加载chunk包插件",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
