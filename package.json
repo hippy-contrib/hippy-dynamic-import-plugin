@@ -1,6 +1,6 @@
 {
   "name": "@hippy/hippy-dynamic-import-plugin",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "hippy webpack打包动态加载chunk包插件",
   "main": "index.js",
   "scripts": {
