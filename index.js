@@ -6,7 +6,7 @@ class HippyDynamicLoadPlugin {
   apply(compiler) {
     compiler.hooks.compilation.tap(
         'CustomImportParserPlugin',
-        (compilation, { normalModuleFactory }) => {
+        (compilation, {normalModuleFactory}) => {
           const handler = (parser, parserOptions) => {
             if (parserOptions.import !== undefined && !parserOptions.import) return;
             parser.hooks.importCall.tap('CustomImportParserPlugin', (expr) => {
@@ -66,14 +66,18 @@ class HippyDynamicLoadPlugin {
 
                 if (!['eager', 'weak'].includes(mode) && chunkName) {
                   // eslint-disable-next-line no-underscore-dangle
-                  if (!global.__DYNAMIC_LOAD_MAP__) {
+                  /**
+                   * __DYNAMIC_LOAD_CUSTOM_PATH_MAP__
+                   * it stores all custom chunk paths
+                   */
+                  if (!global.__DYNAMIC_LOAD_CUSTOM_PATH_MAP__) {
                     // eslint-disable-next-line no-underscore-dangle
-                    global.__DYNAMIC_LOAD_MAP__ = {
+                    global.__DYNAMIC_LOAD_CUSTOM_PATH_MAP__ = {
                       [chunkName]: importOptions.customChunkPath,
                     };
                   } else {
                     // eslint-disable-next-line no-underscore-dangle
-                    Object.assign(global.__DYNAMIC_LOAD_MAP__, {
+                    Object.assign(global.__DYNAMIC_LOAD_CUSTOM_PATH_MAP__, {
                       [chunkName]: importOptions.customChunkPath,
                     });
                   }
@@ -109,7 +113,7 @@ class HippyDynamicLoadPlugin {
                   '',
                   'var installedChunkData = installedChunks[chunkId];',
                   'if(installedChunkData !== 0) { // 0 means "already installed".',
-                  Template.indent(['',
+                  Template.indent([
                     '// a Promise means "currently loading".',
                     'if(installedChunkData) {',
                     Template.indent(['promises.push(installedChunkData[2]);']),
@@ -122,41 +126,53 @@ class HippyDynamicLoadPlugin {
                       ]),
                       '});',
                       'promises.push(installedChunkData[2] = promise);',
-                      '',
                       '// start chunk loading',
-                      global.__DYNAMIC_LOAD_MAP__
-                      ? `if(!global.__DYNAMIC_LOAD_MAP__) {
-                            try {
-                              global.__DYNAMIC_LOAD_MAP__ = JSON.parse('${JSON.stringify(global.__DYNAMIC_LOAD_MAP__)}');
-                            } catch(err) {
-                              console.error('parse __DYNAMIC_LOAD_MAP__ error', err)
-                       }}` : "",
-                      `var path = jsonpScriptSrc(chunkId);
-                       if (path && global.__DYNAMIC_LOAD_MAP__) {
-                          var isSchema = ['https://', 'http://', '//'].some(schema => path.indexOf(schema) === 0);
-                          if(isSchema) {
-                            var pathList = path.split('/');
-                            var chunkAllName = pathList[pathList.length -1];
-                            var chunkName = chunkAllName.split('.')[0];
-                            var customChunkPath = global.__DYNAMIC_LOAD_MAP__[chunkName];
-                            if(customChunkPath) path = customChunkPath + chunkAllName;
-                            } else {
-                              var chunkName = path.split('.')[0];
-                              var customChunkPath = global.__DYNAMIC_LOAD_MAP__[chunkName];
-                              if(customChunkPath) path = customChunkPath + path;
-                            }
-                          }`,
-                      'onScriptComplete = function (error) {',
+                      global.__DYNAMIC_LOAD_CUSTOM_PATH_MAP__
+                      && 'if(!global.__DYNAMIC_LOAD_CUSTOM_PATH_MAP__) {',
                       Template.indent([
-                        'if(error) {',
+                        'try {',
                         Template.indent([
-                          'error.name = "ChunkLoadError";',
-                          'chunk[1](error);',
-                          'installedChunks[chunkId] = undefined;',
+                          `var stringifiedMap = JSON.parse('${JSON.stringify(global.__DYNAMIC_LOAD_CUSTOM_PATH_MAP__)}');`,
+                          `global.__DYNAMIC_LOAD_CUSTOM_PATH_MAP__ = stringifiedMap;`,
+                        ]),
+                        `} catch(err) {`,
+                        Template.indent([`console.error('parse __DYNAMIC_LOAD_CUSTOM_PATH_MAP__ error', err);`,]),
+                        `}`,
+                      ]),
+                      '}',
+                      `var path = jsonpScriptSrc(chunkId);`,
+                      `if (path && global.__DYNAMIC_LOAD_CUSTOM_PATH_MAP__) {`,
+                      Template.indent([
+                        `var isSchema = ['https://', 'http://', '//'].some(schema => path.indexOf(schema) === 0);`,
+                        `if(isSchema) {`,
+                        Template.indent([
+                          `var pathList = path.split('/');`,
+                          `var chunkAllName = pathList[pathList.length -1];`,
+                          `var chunkName = chunkAllName.split('.')[0];`,
+                          `var customChunkPath = global.__DYNAMIC_LOAD_CUSTOM_PATH_MAP__[chunkName];`,
+                          `if(customChunkPath) path = customChunkPath + chunkAllName;`,
+                        ]),
+                        `} else {`,
+                        Template.indent([
+                          `var chunkName = path.split('.')[0];`,
+                          ` var customChunkPath = global.__DYNAMIC_LOAD_CUSTOM_PATH_MAP__[chunkName];`,
+                          `if(customChunkPath) path = customChunkPath + path;`
+                        ]),
+                        `}`,
+                      ]),
+                      `}`,
+                      `onScriptComplete = function (error) {`,
+                      Template.indent([
+                        'if(error instanceof Error) {',
+                        Template.indent([
+                          `error.message += ', load chunk ' + chunkId + ' failed, path is ' + path;`,
+                          `var chunk = installedChunks[chunkId];`,
+                          `chunk !== 0 && chunk && chunk[1](error);`,
+                          `installedChunks[chunkId] = undefined;`,
                         ]),
                         '}',
                       ]),
-                      '};',
+                      '}',
                       'global.dynamicLoad(path, onScriptComplete);',
                     ]),
                     '}',
