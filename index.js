@@ -128,18 +128,18 @@ class HippyDynamicLoadPlugin {
                       'promises.push(installedChunkData[2] = promise);',
                       '// start chunk loading',
                       global.__DYNAMIC_LOAD_CUSTOM_PATH_MAP__
-                      && 'if(!global.__DYNAMIC_LOAD_CUSTOM_PATH_MAP__) {',
-                      Template.indent([
-                        'try {',
-                        Template.indent([
-                          `var stringifiedMap = JSON.parse('${JSON.stringify(global.__DYNAMIC_LOAD_CUSTOM_PATH_MAP__)}');`,
-                          `global.__DYNAMIC_LOAD_CUSTOM_PATH_MAP__ = stringifiedMap;`,
-                        ]),
-                        `} catch(err) {`,
-                        Template.indent([`console.error('parse __DYNAMIC_LOAD_CUSTOM_PATH_MAP__ error', err);`,]),
-                        `}`,
-                      ]),
-                      '}',
+                          ? 'if(!global.__DYNAMIC_LOAD_CUSTOM_PATH_MAP__) {' +
+                          Template.indent([
+                            'try {',
+                            Template.indent([
+                              `var stringifiedMap = JSON.parse('${JSON.stringify(global.__DYNAMIC_LOAD_CUSTOM_PATH_MAP__)}');`,
+                              `global.__DYNAMIC_LOAD_CUSTOM_PATH_MAP__ = stringifiedMap;`,
+                            ]),
+                            `} catch(err) {`,
+                            Template.indent([`console.error('parse __DYNAMIC_LOAD_CUSTOM_PATH_MAP__ error', err);`,]),
+                            `}`,
+                          ]) +
+                          '}' : '',
                       `var path = jsonpScriptSrc(chunkId);`,
                       `if (path && global.__DYNAMIC_LOAD_CUSTOM_PATH_MAP__) {`,
                       Template.indent([
