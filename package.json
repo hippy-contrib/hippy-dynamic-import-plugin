@@ -4,6 +4,7 @@
   "description": "hippy webpack打包动态加载chunk包插件",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint --fix \"./index.js\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -20,6 +21,15 @@
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/hippy-contrib/hippy-dynamic-import-plugin/issues"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.14.6",
+    "@babel/eslint-parser": "^7.13.4",
+    "@babel/parser": "^7.15.2",
+    "eslint": "^7.28.0",
+    "eslint-config-tencent": "^1.0.2",
+    "eslint-import-resolver-alias": "^1.1.2",
+    "eslint-plugin-import": "^2.18.2"
   },
   "homepage": "https://github.com/hippy-contrib/hippy-dynamic-import-plugin#readme"
 }
