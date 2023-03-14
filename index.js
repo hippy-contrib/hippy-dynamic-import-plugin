@@ -259,3 +259,4 @@ function getWebpackVersion(compiler) {
 }
 
 module.exports = HippyDynamicLoadPlugin;
+module.exports.HippyDynamicLoadPlugin = HippyDynamicLoadPlugin;
